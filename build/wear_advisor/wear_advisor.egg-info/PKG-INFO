@@ -1,0 +1,13 @@
+Metadata-Version: 2.1
+Name: wear-advisor
+Version: 0.0.0
+Summary: ROS2 package that suggests clothing based on weather and temperature input.
+Home-page: UNKNOWN
+Maintainer: Yuken Ro
+Maintainer-email: yuken.lu3@gmail.com
+License: BSD-3-Clause
+Platform: UNKNOWN
+Provides-Extra: test
+
+UNKNOWN
+

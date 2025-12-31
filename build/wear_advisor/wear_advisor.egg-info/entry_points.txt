@@ -1,0 +1,5 @@
+[console_scripts]
+wear_node = wear_advisor.wear_node:main
+wear_print = wear_advisor.wear_print:main
+wear_pub = wear_advisor.wear_pub:main
+
