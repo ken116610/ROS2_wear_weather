@@ -3,9 +3,9 @@
 <package format="3">
   <name>wear_advisor</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="yuken.lu3@gmail.com">yuxuan</maintainer>
-  <license>TODO: License declaration</license>
+  <description>Suggests what to wear from temperature and weather via ROS 2 topics.</description>
+  <maintainer email="yuken.lu3@gmail.com">Yuken Ro</maintainer>
+  <license>BSD-3-Clouse</license>
 
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
