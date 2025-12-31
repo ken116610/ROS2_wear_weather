@@ -13,25 +13,31 @@ cd "$(dirname "$0")"
 cd ~/ros2_ws
 source install/setup.bash
 
-# start node
 ros2 run wear_advisor wear_node &
 NODE_PID=$!
 sleep 0.5
 
-# helper: publish then capture one response
 run_case () {
-  req="$1"
-  expected="$2"
+    req="$1"
+    expected="$2"
 
-  # start echo (capture 1 message)
-  out=$( (ros2 topic echo -n 1 /wear_response 2>/dev/null &) ; \
-        sleep 0.1 ; \
-        ros2 topic pub -1 /wear_request std_msgs/msg/String "{data: '$req'}" >/dev/null ; \
-        sleep 0.5 ; \
-        ros2 topic echo -n 1 /wear_response 2>/dev/null || true )
+    tmp=$(mktemp)
 
-  echo "$out" | grep -q "$expected" || ng $LINENO
+    ros2 topic echo -n 1 /wear_response > "$tmp" 2>/dev/null &
+    ECHO_PID=$!
+
+    sleep 0.2
+
+    ros2 topic pub -1 /wear_request std_msgs/msg/String "{data: '$req'}" > /dev/null
+
+    wait $ECHO_PID 2>/dev/null || true
+
+    out=$(cat "$tmp")
+    rm -f "$tmp"
+
+    echo "$out" | grep -q "$expected" || ng $LINENO
 }
+
 
 run_case "28 sunny" "トップス: 半袖"
 run_case "15 rain" "傘"
