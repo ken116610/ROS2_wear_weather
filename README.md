@@ -14,11 +14,40 @@
 ## 使い方
 ### 1.リポジトリのインストール
 '''
-git clone https://github.com/ken116610/ROS2_wear_weather.git
+$ git clone https://github.com/ken116610/ROS2_wear_weather.git
+$ cd ros2_ws
+$ coicon build --symlink-install
+$ source install/setup.bash
+'''
+
+### 2.コマンドの実行
+3つのターミナルを使用します。
+#### 1つ目ノードの起動
+'''
+$ ros2 run wear_advisor wear_node
+'''
+#### 2つ目結果の表示
+'''
+$ ros2 run wear_advisor wear_print
+'''
+#### 3つ目気温の入力と送信
+weatherのところに気温を入力する
+'''
+$ echo "weather" | ros2 run wear_advisor wear_pub
+'''
+
+## 実行例
+'''
+$ echo "15" | ros2 run wear_advisor wear_pub
+トップス：長袖
+ボトムス：長ズボン
+アウター：薄手ジャケット
+'''
 
 ## 動作環境
 Ubuntu 22.04 LTS\
-Python3 系
+Python3 系\
+GitHub Actions\
 ROS2
 
 
