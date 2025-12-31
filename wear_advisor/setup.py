@@ -13,10 +13,10 @@ setup(
     ],
     install_requires=['setuptools'],
     zip_safe=True,
-    maintainer='yuxuan',
+    maintainer='Yuken Ro',
     maintainer_email='yuken.lu3@gmail.com',
-    description='TODO: Package description',
-    license='TODO: License declaration',
+    description='ROS2 package that suggests clothing based on weather and temperature input.',
+    license='BSD-3-Clause',
     extras_require={
         'test': [
             'pytest',
@@ -24,6 +24,9 @@ setup(
     },
     entry_points={
         'console_scripts': [
+             'wear_node = wear_advisor.wear_node:main',
+             'wear_pub = wear_advisor.wear_pub:main',
+             'wear_print = wear_advisor.wear_print:main',
         ],
     },
 )
