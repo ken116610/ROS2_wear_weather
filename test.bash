@@ -1,51 +1,64 @@
 #!/bin/bash -xv
-# SPDX-FileCopyrightText: 2025 ken116610
+# SPDX-FileCopyrightText: 2025 Yuken Ro
 # SPDX-License-Identifier: BSD-3-Clause
 
-ng () {
-  echo "NG at line $1"
-  res=1
-}
+set -e
 
+set +u
+: "${AMENT_TRACE_SETUP_FILES:=}"
+source /opt/ros/humble/setup.bash
+source ~/ros2_ws/install/setup.bash
+set -u
+
+export LANG=C.UTF-8
+export LC_ALL=C.UTF-8
+
+ng() { echo "NG at line $1"; res=1; }
 res=0
 
-cd "$(dirname "$0")"
-cd ~/ros2_ws
-source install/setup.bash
+pkill -f "wear_advisor.*wear_" 2>/dev/null || true
+sleep 0.2
 
-ros2 run wear_advisor wear_node &
+ros2 run wear_advisor wear_node --ros-args -r __node:=wear_node_test &
 NODE_PID=$!
-sleep 0.5
+sleep 0.8
 
-run_case () {
-    req="$1"
-    expected="$2"
+run_case() {
+  local temp="$1"
+  local e1="$2"
+  local e2="$3"
+  local e3="$4"
 
-    tmp=$(mktemp)
+  echo "==== REQ: ${temp} ===="
 
-    ros2 topic echo -n 1 /wear_response > "$tmp" 2>/dev/null &
-    ECHO_PID=$!
+  tmp="$(mktemp)"
+  ros2 topic echo -n 1 /wear_response > "$tmp" 2>/dev/null &
+  ECHO_PID=$!
+  sleep 0.2
 
-    sleep 0.2
+  echo "$temp" | ros2 run wear_advisor wear_pub > /dev/null
 
-    ros2 topic pub -1 /wear_request std_msgs/msg/String "{data: '$req'}" > /dev/null
+  wait "$ECHO_PID" 2>/dev/null || true
 
-    wait $ECHO_PID 2>/dev/null || true
+  out="$(cat "$tmp")"
+  rm -f "$tmp"
 
-    out=$(cat "$tmp")
-    rm -f "$tmp"
+  echo "$out"
 
-    echo "$out" | grep -q "$expected" || ng $LINENO
+  echo "$out" | grep -Fq "$e1" || ng $LINENO
+  echo "$out" | grep -Fq "$e2" || ng $LINENO
+  echo "$out" | grep -Fq "$e3" || ng $LINENO
 }
 
+# 期待値（あなたのロジックに合わせて）
+run_case "3"  "厚手" "長ズボン" "コート"
+run_case "8"  "長袖" "長ズボン" "コート"
+run_case "15" "長袖" "長ズボン" "薄手ジャケット"
+run_case "22" "長袖" "長ズボン" "なし"
+run_case "28" "半袖" "短パン" "なし"
 
-run_case "28 sunny" "トップス: 半袖"
-run_case "15 rain" "傘"
-run_case "3 snow" "コート"
+kill "$NODE_PID" 2>/dev/null || true
+wait "$NODE_PID" 2>/dev/null || true
 
-kill $NODE_PID
-wait $NODE_PID 2>/dev/null || true
-
-[ "$res" = 0 ] && echo OK
+[ "$res" = 0 ] && echo "OK"
 exit "$res"
-
